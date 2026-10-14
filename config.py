@@ -60,11 +60,11 @@ TEST_RATIO: float = 0.1
 # Training Hyperparameters
 # ============================================================
 RANDOM_SEED: int = 42
-BATCH_SIZE: int = 32
-NUM_EPOCHS: int = 20
+BATCH_SIZE: int = 64
+NUM_EPOCHS: int = 40
 LEARNING_RATE: float = 1e-3
 WEIGHT_DECAY: float = 1e-4
-EARLY_STOPPING_PATIENCE: int = 7
+EARLY_STOPPING_PATIENCE: int = 10
 
 # Dropout rates
 DROPOUT_CONV: float = 0.25

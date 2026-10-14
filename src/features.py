@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_audio(filepath: str, sr: int = SAMPLE_RATE) -> tuple[np.ndarray, int]:
-    """Load an audio file and resample to target sample rate.
+    """Load an audio file, resample, and peak-normalize to standard range.
 
     Args:
         filepath: Path to the audio file (.wav, .mp3, .ogg).
@@ -39,7 +39,10 @@ def load_audio(filepath: str, sr: int = SAMPLE_RATE) -> tuple[np.ndarray, int]:
     """
     try:
         y, sr_out = librosa.load(filepath, sr=sr, mono=True)
-        return y, sr_out
+        peak = np.max(np.abs(y))
+        if peak > 0:
+            y = y / peak
+        return y.astype(np.float32), sr_out
     except Exception as e:
         logger.error(f"Failed to load audio: {filepath} — {e}")
         raise
@@ -49,28 +52,44 @@ def segment_audio(
     y: np.ndarray,
     sr: int = SAMPLE_RATE,
     segment_duration: float = SEGMENT_DURATION,
-    num_segments: int = NUM_SEGMENTS_PER_TRACK,
+    num_segments: Optional[int] = None,
+    hop_duration: Optional[float] = None,
 ) -> list[np.ndarray]:
-    """Segment a 30s audio clip into non-overlapping 3s slices.
+    """Segment an audio clip into 3s slices, with optional sliding-window hop.
 
     Args:
         y: Audio time-series signal.
         sr: Sample rate.
         segment_duration: Duration of each segment in seconds.
-        num_segments: Number of segments to extract.
+        num_segments: Number of segments for disjoint extraction.
+        hop_duration: Optional hop duration for dense overlapping windowing (e.g. 1.5s).
 
     Returns:
         List of audio segments as numpy arrays.
     """
     segment_samples = int(sr * segment_duration)
+
+    if hop_duration is not None and hop_duration > 0:
+        hop_samples = int(sr * hop_duration)
+        segments = []
+        start = 0
+        while start + segment_samples <= len(y):
+            segments.append(y[start : start + segment_samples])
+            start += hop_samples
+        if len(segments) == 0:
+            segment = np.zeros(segment_samples, dtype=np.float32)
+            segment[: len(y)] = y[:segment_samples]
+            segments.append(segment)
+        return segments
+
+    n_seg = num_segments if num_segments is not None else NUM_SEGMENTS_PER_TRACK
     segments = []
-    for i in range(num_segments):
+    for i in range(n_seg):
         start = i * segment_samples
         end = start + segment_samples
         if end <= len(y):
             segments.append(y[start:end])
         else:
-            # Pad shorter segment with zeros
             segment = np.zeros(segment_samples, dtype=np.float32)
             remaining = y[start:]
             segment[: len(remaining)] = remaining

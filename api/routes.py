@@ -105,32 +105,28 @@ async def predict_genre(file: UploadFile = File(...)):
         if model is None:
             raise HTTPException(status_code=503, detail="Model is not currently loaded.")
 
-        # Load and segment audio
+        # Load and segment audio with 50% overlap for dense, robust voting
         y, sr = load_audio(str(temp_path))
-        segments = segment_audio(y)
+        segments = segment_audio(y, hop_duration=1.5)
 
-        # Predict each segment
-        all_probs = []
-        segment_predictions = []
-
+        # Batch inference on all segments at once on GPU/device
+        tensors = []
         for seg in segments:
             S = compute_mel_spectrogram(seg)
-            tensor = mel_spectrogram_to_tensor(S, target_length=130)
-            tensor = tensor.unsqueeze(0).to(device)  # [1, 1, 128, 130]
+            tensors.append(mel_spectrogram_to_tensor(S, target_length=130))
+        batch_tensor = torch.stack(tensors).to(device)  # [N, 1, 128, 130]
 
-            with torch.no_grad():
-                output = model(tensor)
-                probs = torch.exp(output).cpu().numpy()[0]  # [10]
+        with torch.no_grad():
+            outputs = model(batch_tensor)
+            all_probs = torch.exp(outputs).cpu().numpy()  # [N, 10]
 
-            all_probs.append(probs)
-            pred_idx = int(np.argmax(probs))
-            segment_predictions.append(IDX_TO_GENRE[pred_idx])
+        segment_predictions = [IDX_TO_GENRE[int(np.argmax(p))] for p in all_probs]
 
-        # Majority vote
+        # Majority vote across dense segments
         vote_counts = Counter(segment_predictions)
         majority_genre = vote_counts.most_common(1)[0][0]
 
-        # Average probabilities across segments
+        # Average probabilities across all dense segments (soft voting)
         avg_probs = np.mean(all_probs, axis=0)
         probabilities = {genre: float(avg_probs[i]) for i, genre in enumerate(GENRES)}
 
@@ -235,17 +231,35 @@ async def get_spectrogram(file: UploadFile = File(...)):
         temp_path.unlink(missing_ok=True)
 
 
+REPRESENTATIVE_SAMPLES: dict[str, str] = {
+    "jazz": "jazz.00005.wav",
+    "classical": "classical.00000.wav",
+    "metal": "metal.00000.wav",
+    "blues": "blues.00000.wav",
+    "disco": "disco.00000.wav",
+    "pop": "pop.00000.wav",
+    "reggae": "reggae.00000.wav",
+    "rock": "rock.00000.wav",
+}
+
+
 @router.get("/samples")
 async def get_sample_tracks():
     """List available sample audio tracks for 1-click testing."""
     samples = []
-    sample_genres = ["classical", "metal", "blues", "jazz", "disco", "pop"]
+    sample_genres = ["classical", "metal", "blues", "jazz", "disco", "pop", "reggae", "rock"]
     for genre in sample_genres:
         genre_dir = RAW_DATA_DIR / genre
         if genre_dir.exists():
-            wav_files = sorted(genre_dir.glob("*.wav"))
-            if wav_files:
-                sample_file = wav_files[0]
+            target_name = REPRESENTATIVE_SAMPLES.get(genre)
+            sample_file = None
+            if target_name and (genre_dir / target_name).exists():
+                sample_file = genre_dir / target_name
+            else:
+                wav_files = sorted(genre_dir.glob("*.wav"))
+                if wav_files:
+                    sample_file = wav_files[0]
+            if sample_file:
                 samples.append({
                     "genre": genre,
                     "filename": sample_file.name,
@@ -265,11 +279,15 @@ async def get_sample_audio(genre: str):
     if not genre_dir.exists():
         raise HTTPException(status_code=404, detail="Genre folder not found")
 
-    wav_files = sorted(genre_dir.glob("*.wav"))
-    if not wav_files:
-        raise HTTPException(status_code=404, detail="No audio file found for genre")
+    target_name = REPRESENTATIVE_SAMPLES.get(genre)
+    if target_name and (genre_dir / target_name).exists():
+        sample_path = genre_dir / target_name
+    else:
+        wav_files = sorted(genre_dir.glob("*.wav"))
+        if not wav_files:
+            raise HTTPException(status_code=404, detail="No audio file found for genre")
+        sample_path = wav_files[0]
 
-    sample_path = wav_files[0]
     return FileResponse(
         path=str(sample_path),
         media_type="audio/wav",
