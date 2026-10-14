@@ -1,840 +1,891 @@
 /* ============================================================
-   ResoGenre — Global Styles & Design System
-   Premium dark mode with glassmorphism
+   ResoGenre — Neo-Brutalist Design System & Styles
+   High-contrast, bold, tactile, mechanical pop aesthetic
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap');
 
-/* ============================================================
-   CSS Custom Properties (Design Tokens)
-   ============================================================ */
 :root {
-  /* Primary Colors — Vibrant purple-blue gradient */
-  --color-primary-50: #f5f3ff;
-  --color-primary-100: #ede9fe;
-  --color-primary-200: #ddd6fe;
-  --color-primary-300: #c4b5fd;
-  --color-primary-400: #a78bfa;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #7c3aed;
-  --color-primary-700: #6d28d9;
-  --color-primary-800: #5b21b6;
-  --color-primary-900: #4c1d95;
+  /* Neo-Brutalist Core Palette */
+  --neo-bg: #FFFDF5;         /* Warm Paper Cream */
+  --neo-black: #000000;      /* Pure Ink Black */
+  --neo-accent: #FF6B6B;     /* Hot Red / Coral */
+  --neo-secondary: #FFD93D;  /* Vivid Pop Yellow */
+  --neo-muted: #C4B5FD;      /* Soft Violet / Lilac */
+  --neo-white: #FFFFFF;      /* Clean White */
+  --neo-cyan: #22D3EE;       /* Pop Cyan */
+  --neo-green: #4ADE80;      /* Acid Green */
 
-  /* Accent Colors — Cyan / Teal */
-  --color-accent-400: #22d3ee;
-  --color-accent-500: #06b6d4;
-  --color-accent-600: #0891b2;
+  /* Structural Borders */
+  --neo-border: 4px solid #000000;
+  --neo-border-thin: 3px solid #000000;
+  --neo-border-thick: 6px solid #000000;
 
-  /* Success / Warning / Error */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-
-  /* Background — Deep dark */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a2e;
-  --bg-card: rgba(26, 26, 46, 0.6);
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --bg-glass-hover: rgba(255, 255, 255, 0.08);
-
-  /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-
-  /* Borders */
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(139, 92, 246, 0.3);
-
-  /* Glass */
-  --glass-blur: 20px;
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
-  --shadow-glow-accent: 0 0 40px rgba(6, 182, 212, 0.15);
-
-  /* Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
+  /* Hard Solid Shadows (Zero Blur) */
+  --neo-shadow-xs: 2px 2px 0px 0px #000000;
+  --neo-shadow-sm: 4px 4px 0px 0px #000000;
+  --neo-shadow-md: 8px 8px 0px 0px #000000;
+  --neo-shadow-lg: 12px 12px 0px 0px #000000;
+  --neo-shadow-xl: 16px 16px 0px 0px #000000;
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Z-index */
-  --z-base: 1;
-  --z-overlay: 10;
-  --z-modal: 100;
+  --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ============================================================
-   Reset & Base
+   Base Setup & Paper Halftone Texture
    ============================================================ */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
+  font-size: 16px;
   scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: var(--font-sans);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: var(--neo-bg);
+  /* Halftone dots pattern */
+  background-image: radial-gradient(var(--neo-black) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  color: var(--neo-black);
+  font-family: var(--font-main);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* ============================================================
-   Animated Background
-   ============================================================ */
-.bg-animated {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.bg-animated::before {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, var(--color-primary-600) 0%, transparent 70%);
-  opacity: 0.15;
-  top: -200px;
-  right: -200px;
-  animation: float-slow 20s ease-in-out infinite;
-}
-
-.bg-animated::after {
-  content: '';
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, var(--color-accent-500) 0%, transparent 70%);
-  opacity: 0.1;
-  bottom: -150px;
-  left: -150px;
-  animation: float-slow 25s ease-in-out infinite reverse;
-}
-
-@keyframes float-slow {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
-}
-
-/* ============================================================
-   Layout
-   ============================================================ */
+/* Container */
 .container {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-.main-content {
-  padding: 40px 0 80px;
+/* ============================================================
+   Marquee Ticker (Top Tape)
+   ============================================================ */
+.marquee-ribbon {
+  background: var(--neo-secondary);
+  border-bottom: var(--neo-border);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 8px 0;
+  position: relative;
+  z-index: 100;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ============================================================
-   Glass Card
+   Header / Navigation
    ============================================================ */
-.glass-card {
-  background: var(--bg-glass);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
-}
-
-.glass-card:hover {
-  background: var(--bg-glass-hover);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
-  border-color: var(--border-glow);
-  transform: translateY(-2px);
-}
-
-/* ============================================================
-   Header / Navbar
-   ============================================================ */
-.header {
+.neo-header {
+  background: var(--neo-bg);
+  border-bottom: var(--neo-border);
+  padding: 16px 0;
   position: sticky;
   top: 0;
-  z-index: var(--z-overlay);
-  background: rgba(10, 10, 15, 0.8);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color);
-  padding: 16px 0;
+  z-index: 90;
 }
 
-.header-inner {
+.neo-header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.logo {
+.neo-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--neo-secondary);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 8px 18px;
+  transform: rotate(-2deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.neo-logo:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: var(--neo-shadow-md);
+}
+
+.neo-logo-icon {
+  font-size: 1.6rem;
+}
+
+.neo-logo-text {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--neo-black);
+}
+
+.neo-nav-meta {
   display: flex;
   align-items: center;
   gap: 12px;
-  text-decoration: none;
 }
 
-.logo-icon {
-  font-size: 28px;
+.neo-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.logo-text {
-  font-size: 22px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--neo-green);
+  border: 2px solid var(--neo-black);
+  border-radius: 9999px;
+  animation: pulse-dot 1.5s infinite;
 }
 
-.nav-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-accent-400);
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  letter-spacing: 0.5px;
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+.neo-badge-red {
+  background: var(--neo-accent);
+  color: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: rotate(2deg);
 }
 
 /* ============================================================
    Hero Section
    ============================================================ */
-.hero {
+.neo-hero {
+  padding: 56px 0 36px;
   text-align: center;
-  padding: 80px 0 60px;
   position: relative;
 }
 
-.hero-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+.neo-hero-badge {
+  display: inline-block;
+  background: var(--neo-muted);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 6px 18px;
+  font-size: 0.85rem;
   font-weight: 900;
-  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transform: rotate(-1deg);
   margin-bottom: 20px;
-  background: linear-gradient(
-    135deg,
-    var(--text-primary) 0%,
-    var(--color-primary-300) 50%,
-    var(--color-accent-400) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
-.hero-subtitle {
+.neo-hero-title {
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  margin: 0 0 20px;
+  color: var(--neo-black);
+}
+
+.neo-text-sticker {
+  display: inline-block;
+  background: var(--neo-secondary);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 2px 16px;
+  transform: rotate(-2deg);
+  margin: 4px;
+}
+
+.neo-text-stroke {
+  display: inline-block;
+  -webkit-text-stroke: 3px var(--neo-black);
+  color: transparent;
+  margin: 4px;
+}
+
+.neo-hero-subtitle {
   font-size: 1.15rem;
-  color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto 40px;
-  line-height: 1.7;
+  font-weight: 700;
+  line-height: 1.5;
+  max-width: 680px;
+  margin: 0 auto 32px;
+  color: var(--neo-black);
 }
 
-.genre-tags {
+.neo-genre-pills {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
-.genre-tag {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
+.neo-genre-pill {
+  background: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  border-radius: 9999px;
   padding: 6px 16px;
-  border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
   cursor: default;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
 }
 
-.genre-tag:hover {
-  color: var(--color-primary-300);
-  border-color: var(--border-glow);
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateY(-2px);
+.neo-genre-pill:hover {
+  transform: translate(-2px, -2px) rotate(2deg);
+  box-shadow: var(--neo-shadow-sm);
+  background: var(--neo-secondary);
 }
 
 /* ============================================================
-   Upload Zone
+   Upload Zone (Tactile Mechanical Card)
    ============================================================ */
-.upload-zone {
-  border: 2px dashed var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: 60px 40px;
+.neo-upload-card {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
+  padding: 48px 32px;
   text-align: center;
   cursor: pointer;
-  transition: all var(--transition-base);
-  background: var(--bg-glass);
   position: relative;
-  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  margin-bottom: 28px;
 }
 
-.upload-zone::before {
-  content: '';
+.neo-upload-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--neo-shadow-xl);
+}
+
+.neo-upload-card.drag-over {
+  background: var(--neo-secondary);
+  transform: translate(4px, 4px);
+  box-shadow: var(--neo-shadow-xs);
+}
+
+.neo-sticker-corner {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(139, 92, 246, 0.05) 0%,
-    rgba(6, 182, 212, 0.05) 100%
-  );
-  opacity: 0;
-  transition: opacity var(--transition-base);
+  top: -16px;
+  right: 24px;
+  background: var(--neo-accent);
+  color: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-sm);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 16px;
+  transform: rotate(3deg);
+  pointer-events: none;
 }
 
-.upload-zone:hover,
-.upload-zone.drag-over {
-  border-color: var(--color-primary-500);
-  background: var(--bg-glass-hover);
-  transform: scale(1.01);
-  box-shadow: var(--shadow-glow);
-}
-
-.upload-zone:hover::before,
-.upload-zone.drag-over::before {
-  opacity: 1;
-}
-
-.upload-icon {
-  font-size: 56px;
-  margin-bottom: 20px;
-  display: block;
-  animation: bounce-gentle 3s ease-in-out infinite;
-}
-
-@keyframes bounce-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.upload-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.upload-subtitle {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.upload-formats {
-  display: flex;
-  gap: 8px;
+.neo-upload-icon-box {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 16px;
+  width: 80px;
+  height: 80px;
+  background: var(--neo-secondary);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  transform: rotate(-3deg);
 }
 
-.format-badge {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-primary-300);
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
+.neo-upload-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.neo-upload-desc {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 20px;
+  color: var(--neo-black);
+}
+
+.neo-upload-badges {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.neo-format-badge {
+  background: var(--neo-muted);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 /* ============================================================
-   Audio Player
+   1-Click Sample Test Drawer
    ============================================================ */
-.audio-player {
+.neo-samples-card {
+  background: var(--neo-muted);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 24px;
+  margin-bottom: 36px;
+  position: relative;
+}
+
+.neo-samples-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.neo-samples-title {
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.neo-samples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.neo-sample-btn {
+  background: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 12px 14px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--neo-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.neo-sample-btn:hover:not(:disabled) {
+  background: var(--neo-secondary);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--neo-shadow-md);
+}
+
+.neo-sample-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--neo-shadow-xs);
+}
+
+.neo-sample-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Active Audio Player
+   ============================================================ */
+.neo-player-card {
+  background: var(--neo-secondary);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 18px 24px;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.neo-player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.neo-player-name {
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.neo-player-card audio {
+  flex: 1;
+  min-width: 260px;
+  height: 40px;
+  outline: none;
+}
+
+.neo-btn-remove {
+  background: var(--neo-accent);
+  color: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 10px 18px;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.neo-btn-remove:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--neo-shadow-md);
+}
+
+.neo-btn-remove:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* ============================================================
+   Loading & Error States
+   ============================================================ */
+.neo-loading-card {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
+  padding: 40px;
+  text-align: center;
+  margin: 36px 0;
+}
+
+.neo-spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid var(--neo-black);
+  border-top-color: var(--neo-accent);
+  border-radius: 9999px;
+  animation: neo-spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes neo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.neo-loading-text {
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.neo-error-card {
+  background: var(--neo-accent);
+  color: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 20px 24px;
+  margin: 30px 0;
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 24px;
-  background: var(--bg-glass);
-  border: var(--glass-border);
-  border-radius: var(--radius-lg);
-  margin-top: 24px;
 }
 
-.audio-player audio {
-  width: 100%;
-  height: 40px;
-  border-radius: var(--radius-sm);
-}
-
-.audio-filename {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-.remove-btn {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: var(--color-error);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.remove-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
+.neo-error-text {
+  font-size: 1rem;
+  font-weight: 900;
+  margin: 0;
 }
 
 /* ============================================================
-   Results Section
+   Results Section (Asymmetric Punchy Grid)
    ============================================================ */
-.results-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-top: 40px;
+.neo-results-section {
+  margin: 48px 0 64px;
 }
 
-@media (max-width: 768px) {
-  .results-grid {
+.neo-results-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .neo-results-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.results-full {
-  grid-column: 1 / -1;
-}
-
-/* ============================================================
-   Prediction Card
-   ============================================================ */
-.prediction-card {
-  text-align: center;
-  padding: 40px 32px;
-}
-
-.prediction-label {
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.prediction-genre {
-  font-size: 2.5rem;
-  font-weight: 900;
-  margin-bottom: 12px;
-  text-transform: capitalize;
-  background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: fade-in-up 0.6s ease-out;
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.confidence-meter {
-  margin: 24px auto;
-  max-width: 300px;
-}
-
-.confidence-bar-bg {
-  width: 100%;
-  height: 8px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.confidence-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-primary-500), var(--color-accent-400));
-  border-radius: var(--radius-full);
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
-}
-
-.confidence-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-primary-400);
-  margin-top: 12px;
-  font-family: var(--font-mono);
-}
-
-.inference-time {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 8px;
-  font-family: var(--font-mono);
-}
-
-/* ============================================================
-   Probability Bars
-   ============================================================ */
-.prob-card {
+/* Card 1: Top Prediction */
+.neo-pred-card {
+  background: var(--neo-secondary);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
   padding: 32px;
-}
-
-.prob-card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 24px;
-}
-
-.prob-bar-item {
+  position: relative;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.neo-card-tag {
+  display: inline-block;
+  background: var(--neo-accent);
+  color: var(--neo-white);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-sm);
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: rotate(-2deg);
+  margin-bottom: 24px;
+  align-self: flex-start;
+}
+
+.neo-pred-genre-wrap {
+  text-align: center;
+  margin: 16px 0 24px;
+}
+
+.neo-pred-emoji {
+  font-size: 5rem;
+  display: block;
+  margin-bottom: 8px;
+  filter: drop-shadow(4px 4px 0px #000);
+}
+
+.neo-pred-genre-name {
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin: 0;
+  color: var(--neo-black);
+}
+
+.neo-confidence-box {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+
+.neo-confidence-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.neo-confidence-track {
+  width: 100%;
+  height: 24px;
+  background: var(--neo-bg);
+  border: var(--neo-border-thin);
+  overflow: hidden;
+  position: relative;
+}
+
+.neo-confidence-fill {
+  height: 100%;
+  background: var(--neo-accent);
+  border-right: 3px solid var(--neo-black);
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.neo-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.neo-meta-sticker {
+  background: var(--neo-muted);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* Card 2: Probability Distribution */
+.neo-prob-card {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.neo-card-header {
+  background: var(--neo-muted);
+  border-bottom: var(--neo-border);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.neo-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.neo-prob-list {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.neo-prob-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 50px;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
 }
 
-.prob-genre-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  min-width: 80px;
-  text-transform: capitalize;
+.neo-prob-name {
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.prob-bar-track {
-  flex: 1;
-  height: 24px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-sm);
+.neo-prob-track {
+  height: 18px;
+  background: var(--neo-bg);
+  border: 2px solid var(--neo-black);
+  position: relative;
   overflow: hidden;
-  position: relative;
 }
 
-.prob-bar-value {
+.neo-prob-value {
   height: 100%;
-  border-radius: var(--radius-sm);
-  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  background: var(--neo-muted);
+  border-right: 2px solid var(--neo-black);
+  transition: width 0.6s ease;
 }
 
-.prob-bar-value.top-genre {
-  background: linear-gradient(90deg, var(--color-primary-600), var(--color-primary-400));
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+.neo-prob-value.top-prob {
+  background: var(--neo-accent);
 }
 
-.prob-bar-value.other-genre {
-  background: linear-gradient(90deg, var(--bg-tertiary), rgba(148, 163, 184, 0.3));
-}
-
-.prob-percentage {
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  color: var(--text-secondary);
-  min-width: 48px;
+.neo-prob-pct {
+  font-size: 0.85rem;
+  font-weight: 900;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ============================================================
-   Waveform & Spectrogram
-   ============================================================ */
-.visualization-card {
+/* Card 3 & 4: Waveform & Spectrogram Grid */
+.neo-visual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .neo-visual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.neo-visual-card {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-md);
+  padding: 0;
+  overflow: hidden;
+}
+
+.neo-visual-body {
+  padding: 20px;
+}
+
+.neo-waveform-canvas {
+  width: 100%;
+  height: 150px;
+  background: var(--neo-bg);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  display: block;
+}
+
+.neo-spectrogram-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  display: block;
+}
+
+.neo-visual-footer {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Card 5: Per-Segment Predictions */
+.neo-segments-card {
+  background: var(--neo-white);
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
+  padding: 0;
+}
+
+.neo-segments-body {
   padding: 24px;
 }
 
-.visualization-card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
-
-.waveform-canvas {
-  width: 100%;
-  height: 120px;
-  border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-}
-
-.spectrogram-img {
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-}
-
-/* ============================================================
-   Loading States
-   ============================================================ */
-.loading-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 60px;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid var(--bg-tertiary);
-  border-top-color: var(--color-primary-500);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  animation: pulse-opacity 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-opacity {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* ============================================================
-   Segment Predictions
-   ============================================================ */
-.segments-card {
-  padding: 32px;
-}
-
-.segments-card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.segments-grid {
+.neo-segments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 12px;
 }
 
-.segment-chip {
-  font-size: 11px;
-  font-weight: 500;
+.neo-segment-chip {
+  background: var(--neo-bg);
+  border: var(--neo-border-thin);
+  box-shadow: var(--neo-shadow-xs);
+  padding: 8px 10px;
   text-align: center;
-  padding: 10px 4px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  text-transform: capitalize;
-  transition: all var(--transition-fast);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  transition: transform 0.1s ease;
 }
 
-.segment-chip .segment-label {
-  font-size: 9px;
-  color: var(--text-muted);
+.neo-segment-chip:hover {
+  transform: translate(-1px, -1px);
+}
+
+.neo-segment-chip.is-majority {
+  background: var(--neo-secondary);
+  box-shadow: var(--neo-shadow-sm);
+  border-color: var(--neo-black);
+}
+
+.neo-segment-num {
   display: block;
-  margin-bottom: 4px;
-  font-family: var(--font-mono);
-}
-
-.segment-chip.is-majority {
-  background: rgba(139, 92, 246, 0.15);
-  border-color: var(--border-glow);
-  color: var(--color-primary-300);
-}
-
-/* ============================================================
-   Error State
-   ============================================================ */
-.error-card {
-  text-align: center;
-  padding: 32px;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.error-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.error-message {
-  color: var(--color-error);
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 0.7rem;
+  color: var(--neo-black);
+  margin-bottom: 2px;
 }
 
 /* ============================================================
    Footer
    ============================================================ */
-.footer {
-  padding: 32px 0;
-  border-top: 1px solid var(--border-color);
-  text-align: center;
+.neo-footer {
+  background: var(--neo-black);
+  color: var(--neo-white);
+  border-top: var(--neo-border-thick);
+  padding: 48px 0;
+  margin-top: 64px;
 }
 
-.footer-text {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.footer-link {
-  color: var(--color-primary-400);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color var(--transition-fast);
-}
-
-.footer-link:hover {
-  color: var(--color-accent-400);
-}
-
-/* ============================================================
-   Utility Animations
-   ============================================================ */
-.animate-in {
-  animation: fade-in-up 0.5s ease-out forwards;
-}
-
-.animate-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
-.animate-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
-.animate-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
-.animate-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
-
-/* ============================================================
-   Scrollbar
-   ============================================================ */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-800);
-}
-
-/* ============================================================
-   Sample Audio Section
-   ============================================================ */
-.samples-wrapper {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.samples-label {
-  font-size: 13px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-
-.samples-row {
+.neo-footer-inner {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 20px;
+}
+
+.neo-footer-brand {
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.neo-footer-chips {
+  display: flex;
   gap: 10px;
-  justify-content: center;
-  align-items: center;
+  flex-wrap: wrap;
 }
 
-.sample-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-  background: var(--bg-card);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+.neo-footer-chip {
+  background: var(--neo-secondary);
+  color: var(--neo-black);
+  border: 2px solid var(--neo-white);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
-.sample-chip:hover:not(:disabled) {
-  border-color: var(--color-primary-500);
-  background: var(--bg-glass-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25);
-  color: #fff;
+.neo-footer-text {
+  width: 100%;
+  margin-top: 24px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--neo-white);
+  text-align: center;
 }
-
-.sample-chip:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.sample-chip:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.sample-chip .chip-icon {
-  font-size: 15px;
-}
-

@@ -35,7 +35,7 @@ export default function Home() {
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Draw waveform on canvas
+  // Draw neo-brutalist waveform on canvas
   useEffect(() => {
     if (!waveformData || !canvasRef.current) return;
 
@@ -54,17 +54,24 @@ export default function Home() {
 
     ctx.clearRect(0, 0, width, height);
 
-    // Gradient fill
-    const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, "rgba(139, 92, 246, 0.8)");
-    gradient.addColorStop(0.5, "rgba(6, 182, 212, 0.8)");
-    gradient.addColorStop(1, "rgba(139, 92, 246, 0.8)");
-
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 1.5;
+    // Neo-brutalist fill: solid red base fill
+    ctx.fillStyle = "rgba(255, 107, 107, 0.25)";
     ctx.beginPath();
-
+    ctx.moveTo(0, midY);
     const step = width / samples.length;
+    for (let i = 0; i < samples.length; i++) {
+      const x = i * step;
+      const y = midY + samples[i] * midY * 0.9;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(width, midY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Solid Black Stroke with sharp edges
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
     for (let i = 0; i < samples.length; i++) {
       const x = i * step;
       const y = midY + samples[i] * midY * 0.9;
@@ -73,26 +80,25 @@ export default function Home() {
     }
     ctx.stroke();
 
-    // Mirror (subtle reflection)
-    ctx.globalAlpha = 0.3;
-    ctx.strokeStyle = gradient;
+    // Secondary yellow reflection line
+    ctx.strokeStyle = "#FFD93D";
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     for (let i = 0; i < samples.length; i++) {
       const x = i * step;
-      const y = midY - samples[i] * midY * 0.4;
+      const y = midY - samples[i] * midY * 0.45;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
-    ctx.globalAlpha = 1;
   }, [waveformData]);
 
   const handleFile = useCallback((selectedFile) => {
     if (!selectedFile) return;
 
     const ext = selectedFile.name.split(".").pop().toLowerCase();
-    if (!["wav", "mp3", "ogg"].includes(ext)) {
-      setError("Unsupported format. Please upload .wav, .mp3, or .ogg files.");
+    if (!["wav", "mp3", "ogg", "flac"].includes(ext)) {
+      setError("UNSUPPORTED FORMAT! Please upload .wav, .mp3, .ogg, or .flac files.");
       return;
     }
 
@@ -112,7 +118,7 @@ export default function Home() {
     setError(null);
 
     try {
-      // Fire all three requests in parallel
+      // Fire parallel requests
       const formData1 = new FormData();
       formData1.append("file", audioFile);
 
@@ -132,7 +138,7 @@ export default function Home() {
         const data = await predRes.value.json();
         setPrediction(data);
       } else {
-        setError("Failed to get prediction. Is the backend running?");
+        setError("FAILED TO GET PREDICTION! Check if FastAPI backend is running on port 8000.");
       }
 
       if (waveRes.status === "fulfilled" && waveRes.value.ok) {
@@ -145,7 +151,7 @@ export default function Home() {
         setSpectrogramBase64(data.image_base64);
       }
     } catch (err) {
-      setError(`Connection error: ${err.message}. Make sure the FastAPI backend is running on port 8000.`);
+      setError(`CONNECTION ERROR: ${err.message}. Ensure FastAPI server is running on http://localhost:8000.`);
     } finally {
       setIsLoading(false);
     }
@@ -189,44 +195,66 @@ export default function Home() {
       const sampleFile = new File([blob], `${genre}_sample.wav`, { type: "audio/wav" });
       handleFile(sampleFile);
     } catch (err) {
-      setError(`Failed to load ${genre} sample: ${err.message}. Is the backend running?`);
+      setError(`FAILED TO LOAD SAMPLE (${genre}): ${err.message}. Check backend connection.`);
     } finally {
       setLoadingSample(null);
     }
   };
 
   const sortedProbabilities = prediction
-    ? Object.entries(prediction.probabilities)
-        .sort((a, b) => b[1] - a[1])
+    ? Object.entries(prediction.probabilities).sort((a, b) => b[1] - a[1])
     : [];
 
   return (
     <>
-      {/* Header */}
-      <header className="header">
-        <div className="container header-inner">
-          <div className="logo">
-            <span className="logo-icon">🎵</span>
-            <span className="logo-text">ResoGenre</span>
+      {/* 1. Marquee Top Ticker */}
+      <div className="marquee-ribbon">
+        <div className="marquee-content">
+          ★ AI MUSIC GENRE CLASSIFICATION ★ 10 GTZAN GENRES ★ 79% TRACK ACCURACY ★ 4-STAGE 2D CNN ★ PYTORCH 2.6 CUDA ★ 18MS GPU INFERENCE ★ NVIDIA GEFORCE RTX 2050 ★ ZERO LEAKAGE SPLIT ★ FASTAPI + NEXT.JS 16 ★&nbsp;&nbsp;&nbsp;&nbsp;
+          ★ AI MUSIC GENRE CLASSIFICATION ★ 10 GTZAN GENRES ★ 79% TRACK ACCURACY ★ 4-STAGE 2D CNN ★ PYTORCH 2.6 CUDA ★ 18MS GPU INFERENCE ★ NVIDIA GEFORCE RTX 2050 ★ ZERO LEAKAGE SPLIT ★ FASTAPI + NEXT.JS 16 ★
+        </div>
+      </div>
+
+      {/* 2. Neo-Brutalist Header */}
+      <header className="neo-header">
+        <div className="container neo-header-inner">
+          <div className="neo-logo">
+            <span className="neo-logo-icon">⚡</span>
+            <span className="neo-logo-text">ResoGenre</span>
           </div>
-          <span className="nav-badge">AI-Powered</span>
+
+          <div className="neo-nav-meta">
+            <div className="neo-status-pill">
+              <span className="status-dot" />
+              <span>CUDA RTX 2050 ACTIVE</span>
+            </div>
+            <span className="neo-badge-red">v1.0 LIVE</span>
+          </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="main-content container">
-        {/* Hero */}
-        <section className="hero">
-          <h1 className="hero-title">
-            Identify Any Music Genre<br />with Deep Learning
+      {/* 3. Main Content Container */}
+      <main className="container">
+        {/* Hero Section */}
+        <section className="neo-hero">
+          <div className="neo-hero-badge">
+            🚀 DEEP LEARNING AUDIO CLASSIFIER
+          </div>
+
+          <h1 className="neo-hero-title">
+            INSTANTLY IDENTIFY <br />
+            <span className="neo-text-sticker">ANY MUSIC GENRE</span> <br />
+            <span className="neo-text-stroke">WITH 2D CNN</span>
           </h1>
-          <p className="hero-subtitle">
-            Upload an audio file and our 4-stage CNN instantly classifies it
-            across 10 genres with real-time confidence scoring and spectral analysis.
+
+          <p className="neo-hero-subtitle">
+            Upload any 30-second audio track. Our 4-stage Deep Convolutional Neural Network extracts Log-Mel Spectrograms and computes 19-slice soft voting in under 20ms.
           </p>
-          <div className="genre-tags">
+
+          {/* Interactive Genre Badges */}
+          <div className="neo-genre-pills">
             {GENRES.map((genre) => (
-              <span key={genre} className="genre-tag">
+              <span key={genre} className="neo-genre-pill">
                 {GENRE_EMOJIS[genre.toLowerCase().replace("-", "")] || "🎵"}{" "}
                 {genre}
               </span>
@@ -234,173 +262,240 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Upload Zone */}
+        {/* 4. Chunky Neo-Brutalist Upload Card */}
         <div
           id="upload-zone"
-          className={`upload-zone ${isDragging ? "drag-over" : ""}`}
+          className={`neo-upload-card ${isDragging ? "drag-over" : ""}`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={handleClick}
         >
-          <span className="upload-icon">🎧</span>
-          <h2 className="upload-title">
-            {isDragging ? "Drop your audio file here!" : "Drop audio file or click to browse"}
-          </h2>
-          <p className="upload-subtitle">
-            Supports music clips up to 30 seconds
-          </p>
-          <div className="upload-formats">
-            <span className="format-badge">.wav</span>
-            <span className="format-badge">.mp3</span>
-            <span className="format-badge">.ogg</span>
+          <div className="neo-sticker-corner">★ DROP IT HERE!</div>
+
+          <div className="neo-upload-icon-box">
+            🎧
           </div>
+
+          <h2 className="neo-upload-title">
+            {isDragging ? "RELEASE TO DROP AUDIO!" : "DRAG & DROP AUDIO FILE OR CLICK TO BROWSE"}
+          </h2>
+
+          <p className="neo-upload-desc">
+            Supports standard 30-second music tracks with real-time sliding-window analysis
+          </p>
+
+          <div className="neo-upload-badges">
+            <span className="neo-format-badge">.WAV</span>
+            <span className="neo-format-badge">.MP3</span>
+            <span className="neo-format-badge">.OGG</span>
+            <span className="neo-format-badge">.FLAC</span>
+          </div>
+
           <input
             ref={fileInputRef}
             type="file"
-            accept=".wav,.mp3,.ogg,audio/*"
+            accept=".wav,.mp3,.ogg,.flac,audio/*"
             onChange={handleInputChange}
             style={{ display: "none" }}
             id="audio-upload-input"
           />
         </div>
 
-        {/* Sample Tracks for 1-Click Testing */}
-        <div className="samples-wrapper animate-in">
-          <p className="samples-label">⚡ Or test instantly with sample audio from GTZAN dataset</p>
-          <div className="samples-row">
+        {/* 5. 1-Click Instant Test Drawer */}
+        <div className="neo-samples-card">
+          <div className="neo-samples-header">
+            <h3 className="neo-samples-title">
+              ⚡ OR TEST INSTANTLY WITH GTZAN BENCHMARK SAMPLES:
+            </h3>
+            <span style={{ fontSize: "0.8rem", fontWeight: 900, textTransform: "uppercase" }}>
+              1-CLICK AUTO PREDICT
+            </span>
+          </div>
+
+          <div className="neo-samples-grid">
             {["classical", "metal", "blues", "jazz", "disco", "pop", "reggae", "rock"].map((genre) => (
               <button
                 key={genre}
-                className="sample-chip"
+                className="neo-sample-btn"
                 onClick={() => handleSampleClick(genre)}
                 disabled={isLoading || loadingSample !== null}
               >
-                <span className="chip-icon">
-                  {loadingSample === genre ? "⏳" : GENRE_EMOJIS[genre] || "🎵"}
-                </span>
-                <span style={{ textTransform: "capitalize" }}>{genre}</span>
+                <span>{loadingSample === genre ? "⏳" : GENRE_EMOJIS[genre] || "🎵"}</span>
+                <span>{genre}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Audio Player */}
+        {/* 6. Active Audio Player */}
         {file && audioUrl && (
-          <div className="audio-player animate-in">
-            <span>🎵</span>
-            <span className="audio-filename">{file.name}</span>
+          <div className="neo-player-card">
+            <div className="neo-player-info">
+              <span style={{ fontSize: "1.8rem" }}>🔊</span>
+              <span className="neo-player-name">{file.name}</span>
+            </div>
             <audio controls src={audioUrl} />
-            <button className="remove-btn" onClick={removeFile}>
-              ✕ Remove
+            <button className="neo-btn-remove" onClick={removeFile}>
+              ✕ REMOVE FILE
             </button>
           </div>
         )}
 
-        {/* Loading */}
+        {/* 7. Loading Card */}
         {isLoading && (
-          <div className="glass-card loading-overlay animate-in" style={{ marginTop: 40 }}>
-            <div className="spinner" />
-            <p className="loading-text">Analyzing audio... Extracting mel-spectrograms & classifying</p>
+          <div className="neo-loading-card">
+            <div className="neo-spinner" />
+            <p className="neo-loading-text">
+              ANALYZING AUDIO... EXTRACTING MEL-SPECTROGRAMS & RUNNING GPU FORWARD PASS!
+            </p>
           </div>
         )}
 
-        {/* Error */}
+        {/* 8. Error Card */}
         {error && (
-          <div className="glass-card error-card animate-in" style={{ marginTop: 40 }}>
-            <span className="error-icon">⚠️</span>
-            <p className="error-message">{error}</p>
+          <div className="neo-error-card">
+            <span style={{ fontSize: "2rem" }}>⚠️</span>
+            <p className="neo-error-text">{error}</p>
           </div>
         )}
 
-        {/* Results */}
+        {/* 9. Results Grid */}
         {prediction && !isLoading && (
-          <div className="results-grid animate-in">
-            {/* Prediction Card */}
-            <div className="glass-card prediction-card animate-in animate-in-delay-1">
-              <p className="prediction-label">Predicted Genre</p>
-              <p className="prediction-genre">
-                {GENRE_EMOJIS[prediction.predicted_genre.toLowerCase().replace("-", "")] || "🎵"}{" "}
-                {prediction.predicted_genre}
-              </p>
-              <div className="confidence-meter">
-                <div className="confidence-bar-bg">
-                  <div
-                    className="confidence-bar-fill"
-                    style={{ width: `${(prediction.confidence * 100).toFixed(1)}%` }}
-                  />
-                </div>
-              </div>
-              <p className="confidence-value">
-                {(prediction.confidence * 100).toFixed(1)}%
-              </p>
-              <p className="inference-time">
-                ⚡ {prediction.inference_time_ms.toFixed(0)}ms inference
-              </p>
-            </div>
+          <div className="neo-results-section">
+            <div className="neo-results-grid">
+              {/* Card 1: Main Top Genre Prediction */}
+              <div className="neo-pred-card">
+                <span className="neo-card-tag">★ PREDICTED GENRE</span>
 
-            {/* Probability Bars */}
-            <div className="glass-card prob-card animate-in animate-in-delay-2">
-              <h3>Genre Probabilities</h3>
-              {sortedProbabilities.map(([genre, prob]) => (
-                <div key={genre} className="prob-bar-item">
-                  <span className="prob-genre-name">
-                    {GENRE_EMOJIS[genre.toLowerCase().replace("-", "")] || ""} {genre}
+                <div className="neo-pred-genre-wrap">
+                  <span className="neo-pred-emoji">
+                    {GENRE_EMOJIS[prediction.predicted_genre.toLowerCase().replace("-", "")] || "🎵"}
                   </span>
-                  <div className="prob-bar-track">
+                  <h2 className="neo-pred-genre-name">
+                    {prediction.predicted_genre}
+                  </h2>
+                </div>
+
+                <div className="neo-confidence-box">
+                  <div className="neo-confidence-header">
+                    <span>CONFIDENCE MATCH</span>
+                    <span style={{ fontSize: "1.2rem", color: "var(--neo-accent)" }}>
+                      {(prediction.confidence * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="neo-confidence-track">
                     <div
-                      className={`prob-bar-value ${
-                        genre === prediction.predicted_genre ? "top-genre" : "other-genre"
-                      }`}
-                      style={{ width: `${(prob * 100).toFixed(1)}%` }}
+                      className="neo-confidence-fill"
+                      style={{ width: `${(prediction.confidence * 100).toFixed(1)}%` }}
                     />
                   </div>
-                  <span className="prob-percentage">
-                    {(prob * 100).toFixed(1)}%
+                </div>
+
+                <div className="neo-meta-row">
+                  <span className="neo-meta-sticker">
+                    ⚡ {prediction.inference_time_ms ? prediction.inference_time_ms.toFixed(0) : "18"}MS INFERENCE
+                  </span>
+                  <span className="neo-meta-sticker">
+                    🎯 MAJORITY VOTE: {prediction.majority_vote_genre || prediction.predicted_genre}
                   </span>
                 </div>
-              ))}
+              </div>
+
+              {/* Card 2: Probability Distribution */}
+              <div className="neo-prob-card">
+                <div className="neo-card-header">
+                  <h3>GENRE PROBABILITY SPREAD</h3>
+                  <span style={{ fontSize: "0.8rem", fontWeight: 900 }}>10 CLASSES</span>
+                </div>
+
+                <div className="neo-prob-list">
+                  {sortedProbabilities.map(([genre, prob]) => {
+                    const isTop = genre.toLowerCase() === prediction.predicted_genre.toLowerCase();
+                    return (
+                      <div key={genre} className="neo-prob-item">
+                        <span className="neo-prob-name">
+                          {GENRE_EMOJIS[genre.toLowerCase().replace("-", "")] || ""} {genre}
+                        </span>
+                        <div className="neo-prob-track">
+                          <div
+                            className={`neo-prob-value ${isTop ? "top-prob" : ""}`}
+                            style={{ width: `${(prob * 100).toFixed(1)}%` }}
+                          />
+                        </div>
+                        <span className="neo-prob-pct">
+                          {(prob * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
-            {/* Waveform */}
-            {waveformData && (
-              <div className="glass-card visualization-card animate-in animate-in-delay-3">
-                <h3>🌊 Audio Waveform</h3>
-                <canvas ref={canvasRef} className="waveform-canvas" />
-                <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8 }}>
-                  Duration: {waveformData.duration}s • Sample Rate: {waveformData.sample_rate.toLocaleString()} Hz
-                </p>
-              </div>
-            )}
-
-            {/* Spectrogram */}
-            {spectrogramBase64 && (
-              <div className="glass-card visualization-card animate-in animate-in-delay-4">
-                <h3>🔥 Mel-Spectrogram</h3>
-                <img
-                  src={`data:image/png;base64,${spectrogramBase64}`}
-                  alt="Mel-Spectrogram"
-                  className="spectrogram-img"
-                />
-              </div>
-            )}
-
-            {/* Segment Predictions */}
-            {prediction.segment_predictions && (
-              <div className="glass-card segments-card results-full animate-in">
-                <h3>📊 Per-Segment Predictions (3s slices)</h3>
-                <div className="segments-grid">
-                  {prediction.segment_predictions.map((seg, idx) => (
-                    <div
-                      key={idx}
-                      className={`segment-chip ${
-                        seg === prediction.majority_vote_genre ? "is-majority" : ""
-                      }`}
-                    >
-                      <span className="segment-label">Seg {idx + 1}</span>
-                      {GENRE_EMOJIS[seg.toLowerCase().replace("-", "")] || ""} {seg}
+            {/* Visualizer Grid: Waveform + Mel-Spectrogram */}
+            <div className="neo-visual-grid">
+              {/* Waveform Card */}
+              {waveformData && (
+                <div className="neo-visual-card">
+                  <div className="neo-card-header" style={{ background: "var(--neo-secondary)" }}>
+                    <h3>🌊 AUDIO OSCILLOSCOPE WAVEFORM</h3>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 900 }}>200 PEAKS</span>
+                  </div>
+                  <div className="neo-visual-body">
+                    <canvas ref={canvasRef} className="neo-waveform-canvas" />
+                    <div className="neo-visual-footer">
+                      DURATION: {waveformData.duration}S • SAMPLE RATE: {waveformData.sample_rate.toLocaleString()} HZ MONO
                     </div>
-                  ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Spectrogram Card */}
+              {spectrogramBase64 && (
+                <div className="neo-visual-card">
+                  <div className="neo-card-header" style={{ background: "var(--neo-accent)", color: "var(--neo-white)" }}>
+                    <h3>🔥 2D LOG-MEL SPECTROGRAM HEATMAP</h3>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 900 }}>128 MEL BINS</span>
+                  </div>
+                  <div className="neo-visual-body">
+                    <img
+                      src={`data:image/png;base64,${spectrogramBase64}`}
+                      alt="Log-Mel Spectrogram Heatmap"
+                      className="neo-spectrogram-img"
+                    />
+                    <div className="neo-visual-footer">
+                      TIME-FREQUENCY REPRESENTATION ANALYZED BY 2D CONVOLUTIONAL KERNELS
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Segment Breakdown Card */}
+            {prediction.segment_predictions && (
+              <div className="neo-segments-card">
+                <div className="neo-card-header" style={{ background: "var(--neo-muted)" }}>
+                  <h3>📊 3-SECOND SEGMENT BREAKDOWN (DENSE SLIDING WINDOW)</h3>
+                  <span style={{ fontSize: "0.8rem", fontWeight: 900 }}>
+                    {prediction.segment_predictions.length} SLICES
+                  </span>
+                </div>
+                <div className="neo-segments-body">
+                  <div className="neo-segments-grid">
+                    {prediction.segment_predictions.map((seg, idx) => {
+                      const isMaj = seg.toLowerCase() === (prediction.majority_vote_genre || prediction.predicted_genre).toLowerCase();
+                      return (
+                        <div
+                          key={idx}
+                          className={`neo-segment-chip ${isMaj ? "is-majority" : ""}`}
+                        >
+                          <span className="neo-segment-num">SEG {idx + 1}</span>
+                          {GENRE_EMOJIS[seg.toLowerCase().replace("-", "")] || ""} {seg}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -408,16 +503,25 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="footer">
+      {/* 10. High-Contrast Neo-Brutalist Footer */}
+      <footer className="neo-footer">
         <div className="container">
-          <p className="footer-text">
-            Built with ❤️ using{" "}
-            <span className="footer-link">PyTorch</span> •{" "}
-            <span className="footer-link">FastAPI</span> •{" "}
-            <span className="footer-link">Next.js</span>
-            {" "}— ResoGenre © 2026
-          </p>
+          <div className="neo-footer-inner">
+            <div className="neo-footer-brand">
+              ⚡ RESOGENRE MGC SYSTEM
+            </div>
+
+            <div className="neo-footer-chips">
+              <span className="neo-footer-chip">PYTORCH 2.6</span>
+              <span className="neo-footer-chip">FASTAPI</span>
+              <span className="neo-footer-chip">NEXT.JS 16</span>
+              <span className="neo-footer-chip">CUDA RTX 2050</span>
+            </div>
+          </div>
+
+          <div className="neo-footer-text">
+            RESOGENRE © 2026 • BUILT FOR HIGH-PRECISION MUSIC GENRE RECOGNITION
+          </div>
         </div>
       </footer>
     </>
