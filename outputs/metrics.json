@@ -1,0 +1,8 @@
+{
+  "test_segment_accuracy": 0.737,
+  "test_macro_f1": 0.7337757185187745,
+  "test_weighted_f1": 0.7337757185187747,
+  "majority_vote_track_accuracy": 0.79,
+  "best_val_accuracy": 0.724,
+  "total_train_time_seconds": 250.18194270133972
+}

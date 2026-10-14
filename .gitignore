@@ -1,44 +1,57 @@
-# Data (raw + processed)
-data/
+# ============================================================
+# ResoGenre .gitignore
+# ============================================================
+
+# Raw audio files and cached processed tensors (keep dataset local/external)
+data/processed/
+data/raw/
+Music_data/
 !data/.gitkeep
 
-# Model checkpoints
-models/
+# Model checkpoints: Include ONLY the best trained model for deployment!
+models/*
 !models/.gitkeep
+!models/resogenre_cnn_best.pth
 
-# Training outputs
-outputs/
+# Training outputs: Include visual reports
+outputs/*
 !outputs/.gitkeep
+!outputs/metrics.json
+!outputs/confusion_matrix.png
+!outputs/training_curves.png
+
+# Node & Next.js Frontend
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+frontend/out/
+.env*.local
 
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
 *.egg-info/
 dist/
 build/
 *.egg
 .eggs/
 
-# Virtual environment
+# Virtual Environment
 venv/
 env/
 .venv/
 
-# IDE
+# Temporary / Scratch files
+scratch/
+*.tmp
+*.log
+
+# IDE & OS
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Jupyter
 .ipynb_checkpoints/
-
-# Misc
-*.log
-*.tmp
