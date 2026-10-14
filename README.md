@@ -261,7 +261,7 @@ graph LR
     end
 
     subgraph Backend["FastAPI REST Server (Port 8000)"]
-        Router["/api/predict · /api/waveform · /api/spectrogram"]
+        Router["/predict · /waveform · /spectrogram · /samples · /health"]
         Lifespan[Lifespan Context Manager: Model in VRAM]
         DSP[Audio Preprocessor: Librosa + TorchAudio]
     end
@@ -400,7 +400,7 @@ npm run dev
 
 FastAPI provides automatic interactive Swagger documentation at `http://localhost:8000/docs`.
 
-### 1. Classify Audio (`POST /api/predict`)
+### 1. Classify Audio (`POST /predict`)
 Accepts an audio file upload (`.wav`, `.mp3`, `.ogg`, `.flac`) and performs full sliding-window soft voting.
 - **Request:** `multipart/form-data` with `file: UploadFile`
 - **Response Format:**
@@ -436,16 +436,20 @@ Accepts an audio file upload (`.wav`, `.mp3`, `.ogg`, `.flac`) and performs full
 }
 ```
 
-### 2. Extract Waveform Vector (`POST /api/waveform`)
+### 2. Extract Waveform Vector (`POST /waveform`)
 Generates 200 normalized amplitude points for client-side audio visualizers.
-- **Response:** `{"points": [0.12, 0.45, 0.82, ..., 0.05], "duration": 30.0}`
+- **Response:** `{"samples": [0.12, 0.45, 0.82, ..., 0.05], "duration": 30.0, "sample_rate": 22050}`
 
-### 3. Compute Mel-Spectrogram (`POST /api/spectrogram`)
+### 3. Compute Mel-Spectrogram (`POST /spectrogram`)
 Returns a base64-encoded PNG image of the exact Log-Mel Spectrogram analyzed by the neural network.
-- **Response:** `{"spectrogram_base64": "data:image/png;base64,iVBORw0KGgo...", "n_mels": 128, "n_frames": 130}`
+- **Response:** `{"image_base64": "data:image/png;base64,iVBORw0KGgo...", "mel_bins": 128, "time_steps": 130}`
 
-### 4. System Health Check (`GET /api/health`)
+### 4. System Health Check (`GET /health`)
 Returns model checkpoint status and active computation device (`cuda` or `cpu`).
+- **Response:** `{"status": "healthy", "model_loaded": true, "device": "cuda"}`
+
+### 5. Get Dataset Audio Samples (`GET /samples`)
+Returns sample audio tracks from each genre for 1-click testing in the UI.
 
 ---
 
