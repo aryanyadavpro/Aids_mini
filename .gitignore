@@ -1,0 +1,44 @@
+# Data (raw + processed)
+data/
+!data/.gitkeep
+
+# Model checkpoints
+models/
+!models/.gitkeep
+
+# Training outputs
+outputs/
+!outputs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.log
+*.tmp
