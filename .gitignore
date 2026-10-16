@@ -12,6 +12,8 @@ Music_data/
 models/*
 !models/.gitkeep
 !models/resogenre_cnn_best.pth
+backend/models/*
+!backend/models/resogenre_cnn_best.pth
 
 # Training outputs: Include visual reports
 outputs/*

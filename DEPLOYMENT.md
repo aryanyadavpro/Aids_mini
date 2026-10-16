@@ -50,10 +50,11 @@ git push origin main
    - **Name:** `resogenre-backend`
    - **Region:** Any (e.g., Oregon or Frankfurt)
    - **Branch:** `main`
-   - **Runtime:** **Docker** *(Render will automatically detect `Dockerfile` in the root!)*
+   - **Root Directory:** **`backend`** *(Points directly to the self-contained backend folder!)*
+   - **Runtime:** **Docker** *(Render detects `backend/Dockerfile` automatically)* OR **Python 3** (Build Command: `pip install -r requirements.txt`, Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`)
    - **Instance Type:** **Free** (512 MB RAM, CPU)
 5. Click **Create Web Service**.
-6. Render will build the Docker container (takes ~3-4 minutes) and provide a live URL, for example:
+6. Render will build the container and provide a live URL, for example:
    ```
    https://resogenre-backend.onrender.com
    ```

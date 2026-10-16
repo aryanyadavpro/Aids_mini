@@ -1,8 +1,5 @@
 """
-api/routes.py — REST API Routes for ResoGenre.
-
-Provides endpoints for genre classification, waveform/spectrogram
-visualization, dataset samples, and system health checks.
+backend/routes.py — REST API Routes for ResoGenre Backend.
 """
 
 import io
@@ -21,33 +18,33 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 
 from config import (
     GENRES,
     IDX_TO_GENRE,
-    RAW_DATA_DIR,
+    SAMPLES_DIR,
     ALLOWED_AUDIO_EXTENSIONS,
 )
-from src.features import (
+from features import (
     load_audio,
     segment_audio,
     compute_mel_spectrogram,
     mel_spectrogram_to_tensor,
 )
-from api.schemas import (
+from schemas import (
     PredictionResponse,
     WaveformResponse,
     SpectrogramResponse,
     HealthResponse,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("resogenre")
 
 router = APIRouter()
 
-# Global reference to model state passed from main.py lifespan
+# Global reference to model state set during lifespan startup
 model_holder = {
     "model": None,
     "device": None,
@@ -56,14 +53,14 @@ model_holder = {
 
 
 def set_model_state(model, device, loaded: bool):
-    """Set model state references for routing."""
+    """Set global model state reference."""
     model_holder["model"] = model
     model_holder["device"] = device
     model_holder["loaded"] = loaded
 
 
 def _save_upload_to_temp(upload: UploadFile) -> Path:
-    """Save uploaded file to a temporary location."""
+    """Save uploaded audio file to temporary location."""
     suffix = Path(upload.filename).suffix.lower()
     if suffix not in ALLOWED_AUDIO_EXTENSIONS:
         raise HTTPException(
@@ -92,8 +89,8 @@ async def health_check():
 async def predict_genre(file: UploadFile = File(...)):
     """Predict the genre of an uploaded audio file.
 
-    Segments the audio into 3s slices, predicts each segment using the 2D CNN,
-    and returns majority-vote genre with averaged confidence distribution.
+    Extracts 19 overlapping 3s slices, runs batched GPU forward pass,
+    and returns soft-probability average and majority-vote consensus.
     """
     temp_path = _save_upload_to_temp(file)
 
@@ -103,13 +100,13 @@ async def predict_genre(file: UploadFile = File(...)):
         device = model_holder["device"]
 
         if model is None:
-            raise HTTPException(status_code=503, detail="Model is not currently loaded.")
+            raise HTTPException(status_code=503, detail="Model is not loaded.")
 
-        # Load and segment audio with 50% overlap for dense, robust voting
+        # Load and segment audio with 50% overlap (1.5s hop)
         y, sr = load_audio(str(temp_path))
         segments = segment_audio(y, hop_duration=1.5)
 
-        # Batch inference on all segments at once on GPU/device
+        # Batch inference on GPU/device
         tensors = []
         for seg in segments:
             S = compute_mel_spectrogram(seg)
@@ -117,33 +114,36 @@ async def predict_genre(file: UploadFile = File(...)):
         batch_tensor = torch.stack(tensors).to(device)  # [N, 1, 128, 130]
 
         with torch.no_grad():
-            outputs = model(batch_tensor)
-            all_probs = torch.exp(outputs).cpu().numpy()  # [N, 10]
+            outputs = model(batch_tensor)  # log_softmax [N, 10]
+            probs = torch.exp(outputs)      # [N, 10]
+            avg_probs = probs.mean(dim=0).cpu().numpy()  # [10]
 
-        segment_predictions = [IDX_TO_GENRE[int(np.argmax(p))] for p in all_probs]
+            _, segment_preds_idx = outputs.max(1)
+            segment_preds = [IDX_TO_GENRE[idx.item()] for idx in segment_preds_idx]
 
-        # Majority vote across dense segments
-        vote_counts = Counter(segment_predictions)
+        # Soft voting genre (argmax of averaged probabilities)
+        predicted_idx = int(np.argmax(avg_probs))
+        predicted_genre = IDX_TO_GENRE[predicted_idx]
+        confidence = float(avg_probs[predicted_idx])
+
+        # Majority vote genre
+        vote_counts = Counter(segment_preds)
         majority_genre = vote_counts.most_common(1)[0][0]
 
-        # Average probabilities across all dense segments (soft voting)
-        avg_probs = np.mean(all_probs, axis=0)
-        probabilities = {genre: float(avg_probs[i]) for i, genre in enumerate(GENRES)}
+        probabilities = {
+            genre: float(avg_probs[idx])
+            for idx, genre in IDX_TO_GENRE.items()
+        }
 
-        # Top prediction
-        top_idx = int(np.argmax(avg_probs))
-        predicted_genre = IDX_TO_GENRE[top_idx]
-        confidence = float(avg_probs[top_idx])
-
-        inference_time = (time.time() - start_time) * 1000  # ms
+        inference_time_ms = (time.time() - start_time) * 1000
 
         return PredictionResponse(
             predicted_genre=predicted_genre,
-            confidence=confidence,
+            confidence=round(confidence, 4),
             probabilities=probabilities,
-            segment_predictions=segment_predictions,
+            segment_predictions=segment_preds,
             majority_vote_genre=majority_genre,
-            inference_time_ms=round(inference_time, 2),
+            inference_time_ms=round(inference_time_ms, 2),
         )
 
     except Exception as e:
@@ -154,24 +154,31 @@ async def predict_genre(file: UploadFile = File(...)):
 
 
 @router.post("/waveform", response_model=WaveformResponse)
-async def get_waveform(file: UploadFile = File(...)):
-    """Return downsampled waveform data for smooth interactive visualization."""
+async def get_waveform(
+    file: UploadFile = File(...),
+    num_points: int = 200,
+):
+    """Downsample audio waveform to 200 points for canvas rendering."""
     temp_path = _save_upload_to_temp(file)
 
     try:
         y, sr = load_audio(str(temp_path))
-        duration = len(y) / sr
+        duration = float(len(y) / sr)
 
-        # Downsample for visualization (max ~2000 points)
-        target_points = 2000
-        if len(y) > target_points:
-            step = len(y) // target_points
-            y_down = y[::step].tolist()
-        else:
-            y_down = y.tolist()
+        chunk_size = max(1, len(y) // num_points)
+        downsampled = []
+        for i in range(num_points):
+            start = i * chunk_size
+            end = min(start + chunk_size, len(y))
+            if start < len(y):
+                chunk = y[start:end]
+                peak = float(np.max(np.abs(chunk))) if len(chunk) > 0 else 0.0
+                downsampled.append(round(peak, 4))
+            else:
+                downsampled.append(0.0)
 
         return WaveformResponse(
-            samples=y_down,
+            samples=downsampled,
             sample_rate=sr,
             duration=round(duration, 2),
         )
@@ -185,19 +192,17 @@ async def get_waveform(file: UploadFile = File(...)):
 
 @router.post("/spectrogram", response_model=SpectrogramResponse)
 async def get_spectrogram(file: UploadFile = File(...)):
-    """Return mel-spectrogram as a base64-encoded PNG image."""
+    """Return Mel-spectrogram as a base64-encoded PNG image."""
     temp_path = _save_upload_to_temp(file)
 
     try:
         y, sr = load_audio(str(temp_path))
 
-        # Compute mel-spectrogram
         S = librosa.feature.melspectrogram(
             y=y, sr=sr, n_fft=2048, hop_length=512, n_mels=128
         )
         S_db = librosa.power_to_db(S, ref=np.max)
 
-        # Generate spectrogram plot
         fig, ax = plt.subplots(figsize=(12, 4))
         librosa.display.specshow(
             S_db, sr=sr, hop_length=512,
@@ -211,7 +216,6 @@ async def get_spectrogram(file: UploadFile = File(...)):
         ax.set_yticks([])
         plt.tight_layout(pad=0)
 
-        # Convert to base64
         buf = io.BytesIO()
         fig.savefig(buf, format="png", dpi=100, bbox_inches="tight", pad_inches=0)
         plt.close(fig)
@@ -231,40 +235,19 @@ async def get_spectrogram(file: UploadFile = File(...)):
         temp_path.unlink(missing_ok=True)
 
 
-REPRESENTATIVE_SAMPLES: dict[str, str] = {
-    "jazz": "jazz.00005.wav",
-    "classical": "classical.00000.wav",
-    "metal": "metal.00000.wav",
-    "blues": "blues.00000.wav",
-    "disco": "disco.00000.wav",
-    "pop": "pop.00000.wav",
-    "reggae": "reggae.00000.wav",
-    "rock": "rock.00000.wav",
-}
-
-
 @router.get("/samples")
 async def get_sample_tracks():
-    """List available sample audio tracks for 1-click testing."""
+    """List sample audio tracks available for 1-click testing."""
     samples = []
-    sample_genres = ["classical", "metal", "blues", "jazz", "disco", "pop", "reggae", "rock"]
+    sample_genres = ["classical", "metal", "blues", "jazz", "disco", "pop", "reggae", "rock", "country", "hiphop"]
     for genre in sample_genres:
-        genre_dir = RAW_DATA_DIR / genre
-        if genre_dir.exists():
-            target_name = REPRESENTATIVE_SAMPLES.get(genre)
-            sample_file = None
-            if target_name and (genre_dir / target_name).exists():
-                sample_file = genre_dir / target_name
-            else:
-                wav_files = sorted(genre_dir.glob("*.wav"))
-                if wav_files:
-                    sample_file = wav_files[0]
-            if sample_file:
-                samples.append({
-                    "genre": genre,
-                    "filename": sample_file.name,
-                    "url": f"/sample/{genre}",
-                })
+        sample_file = SAMPLES_DIR / f"{genre}.wav"
+        if sample_file.exists():
+            samples.append({
+                "genre": genre,
+                "filename": sample_file.name,
+                "url": f"/sample/{genre}",
+            })
     return {"samples": samples}
 
 
@@ -275,18 +258,9 @@ async def get_sample_audio(genre: str):
     if genre not in GENRES:
         raise HTTPException(status_code=404, detail=f"Genre {genre} not found")
 
-    genre_dir = RAW_DATA_DIR / genre
-    if not genre_dir.exists():
-        raise HTTPException(status_code=404, detail="Genre folder not found")
-
-    target_name = REPRESENTATIVE_SAMPLES.get(genre)
-    if target_name and (genre_dir / target_name).exists():
-        sample_path = genre_dir / target_name
-    else:
-        wav_files = sorted(genre_dir.glob("*.wav"))
-        if not wav_files:
-            raise HTTPException(status_code=404, detail="No audio file found for genre")
-        sample_path = wav_files[0]
+    sample_path = SAMPLES_DIR / f"{genre}.wav"
+    if not sample_path.exists():
+        raise HTTPException(status_code=404, detail=f"Sample file for genre {genre} not found")
 
     return FileResponse(
         path=str(sample_path),

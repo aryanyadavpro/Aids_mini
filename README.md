@@ -287,49 +287,38 @@ graph LR
 
 ```
 AIDS_mini/
-├── api/                             # FastAPI Backend Service
-│   ├── __init__.py
-│   ├── main.py                      # FastAPI app initialization, CORS, lifespan model loading
-│   ├── routes.py                    # Endpoints: /predict, /waveform, /spectrogram, /samples, /health
-│   └── schemas.py                   # Pydantic data validation schemas
-├── config.py                        # Centralized hyperparameters, seeds, audio settings & paths
-├── data/                            # Audio Dataset Directory
-│   ├── raw/                         # Original GTZAN .wav audio files categorized by genre
-│   │   ├── blues/
-│   │   ├── classical/
-│   │   ├── ...                      # (10 genre folders, 100 tracks each)
-│   │   └── rock/
-│   └── processed/                   # Cached pre-extracted 3s PyTorch tensors (.pt)
-├── frontend/                        # Next.js 16 Production Web Application
-│   ├── public/                      # Static web assets & genre icons
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── layout.tsx           # Global HTML layout and metadata
-│   │   │   ├── page.tsx             # Main interactive application dashboard
-│   │   │   └── globals.css          # Design system, dark theme tokens & keyframe animations
-│   │   └── components/              # Modular UI components (Visualizer, AudioPlayer, Cards)
+├── backend/                         # 🚀 Self-Contained Backend (Deployable Directly)
+│   ├── main.py                      # FastAPI app entrypoint, lifespan, CORS, route mounting
+│   ├── routes.py                    # REST Endpoints: /predict, /waveform, /spectrogram, /samples
+│   ├── schemas.py                   # Pydantic data validation contracts
+│   ├── model.py                     # GenreCNN (4-stage 2D CNN architecture)
+│   ├── features.py                  # Audio loading, peak normalization, mel-spectrogram extraction
+│   ├── utils.py                     # Device selector (CUDA/CPU), model checkpoint loader
+│   ├── config.py                    # Standalone backend audio & server configuration
+│   ├── models/
+│   │   └── resogenre_cnn_best.pth   # Pinned trained model weights (5.1 MB)
+│   ├── samples/                     # 10 sample audio tracks for 1-click test UI (~6 MB)
+│   ├── requirements.txt             # Lean production backend dependencies
+│   ├── Dockerfile                   # Standalone Dockerfile for backend cloud deployment
+│   └── README.md                    # Backend run & deployment instructions
+├── frontend/                        # 🎨 Next.js 16 Web Application (Neo-Brutalist UI)
+│   ├── src/app/
+│   │   ├── page.js                  # Interactive application dashboard & visualizers
+│   │   ├── layout.js                # Space Grotesk font & root layout
+│   │   └── globals.css              # Neo-brutalist design tokens, borders, shadows, marquee
 │   ├── package.json                 # Node dependencies (Next.js 16, React 19)
-│   └── tsconfig.json                # TypeScript compiler configuration
-├── models/                          # Serialized Model Weights & Checkpoints
-│   ├── resogenre_cnn_best.pth       # Highest validation accuracy checkpoint (Epoch 37, 72.4% val acc)
-│   └── resogenre_cnn_epoch*.pth     # Epoch checkpoints
-├── outputs/                         # Evaluation Artifacts & Visualizations
-│   ├── confusion_matrix.png         # Normalized 10x10 confusion matrix heatmap
-│   ├── training_curves.png          # Dual-axis loss & accuracy training progression plots
-│   └── metrics.json                 # Exported JSON test scores
-├── src/                             # Core Machine Learning Pipeline
-│   ├── __init__.py
+│   └── Dockerfile                   # Containerized frontend definition
+├── src/                             # 🔬 ML Training & Research Pipeline
 │   ├── baseline.py                  # Random Forest 55-feature baseline implementation
 │   ├── dataset.py                   # GTZAN PyTorch Dataset with leakage-safe song splitting
 │   ├── evaluate.py                  # Evaluation suite, classification reports, majority-voting
-│   ├── features.py                  # Mel-spectrogram, STFT, decibel scaling & dense segmentation
-│   ├── model.py                     # 4-stage 2D CNN architecture definition
 │   ├── train.py                     # 40-epoch GPU training loop with AdamW and LR scheduling
-│   └── utils.py                     # Seed pinning (42), device selector (CUDA/CPU), checkpoint helpers
-├── IMPLEMENTATION.md                # Phase-by-phase engineering milestones & build tracker
-├── requirements.txt                 # Pinned Python package dependencies
+│   └── ...
+├── outputs/                         # Evaluation Artifacts (Curves, Confusion Matrix, Metrics)
+├── docker-compose.yml               # Multi-container orchestration (Backend + Frontend)
 ├── run.bat                          # 1-Click Windows launcher script for both servers
-└── README.md                        # Comprehensive system documentation
+├── DEPLOYMENT.md                    # Step-by-step free deployment guide (Vercel + Render)
+└── README.md                        # Master system documentation
 ```
 
 ---

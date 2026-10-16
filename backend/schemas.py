@@ -1,20 +1,18 @@
 """
-api/schemas.py — Pydantic Models for Request/Response Validation.
-
-Defines the data shapes for all FastAPI endpoints.
+backend/schemas.py — Pydantic Request & Response Models for ResoGenre.
 """
 
 from pydantic import BaseModel
 
 
 class GenrePrediction(BaseModel):
-    """Single genre prediction with confidence."""
+    """Single genre prediction item."""
     genre: str
     confidence: float
 
 
 class PredictionResponse(BaseModel):
-    """Full prediction response from the /predict endpoint."""
+    """Prediction response returned by POST /predict."""
     predicted_genre: str
     confidence: float
     probabilities: dict[str, float]
@@ -24,21 +22,21 @@ class PredictionResponse(BaseModel):
 
 
 class WaveformResponse(BaseModel):
-    """Waveform data for visualization."""
+    """Waveform amplitudes returned by POST /waveform."""
     samples: list[float]
     sample_rate: int
     duration: float
 
 
 class SpectrogramResponse(BaseModel):
-    """Base64-encoded spectrogram image."""
+    """Base64-encoded Mel-spectrogram image returned by POST /spectrogram."""
     image_base64: str
     width: int
     height: int
 
 
 class HealthResponse(BaseModel):
-    """API health check response."""
+    """Status returned by GET /health."""
     status: str
     model_loaded: bool
     device: str
